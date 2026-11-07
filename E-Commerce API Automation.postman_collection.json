@@ -1,0 +1,652 @@
+{
+  "info": {
+    "_postman_id": "9172a6c7-3654-4f5e-9cb3-9bc0436519fc",
+    "name": "E-Commerce API Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "29678224"
+  },
+  "item": [
+    {
+      "name": "01_Users_API",
+      "item": [
+        {
+          "name": "TC_001_Get_All_Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "// Test Case 1: Verify Status Code\r",
+                  "pm.test(\"Status code should be 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 2: Verify Response Time\r",
+                  "pm.test(\"Response time should be below 3000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 3: Verify Response Body\r",
+                  "pm.test(\"Response body should not be empty\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.not.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 4: Verify Users Array\r",
+                  "pm.test(\"Users array should exist\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 5: Verify Users Count\r",
+                  "pm.test(\"Users list should contain records\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users.length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 6: Verify First User ID\r",
+                  "pm.test(\"First user should have a valid ID\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users[0].id).to.be.a(\"number\");\r",
+                  "});\r",
+                  "const data = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"existingUserId\", data.users[0].id);\r",
+                  "\r",
+                  "console.log(\"Saved User ID:\", data.users[0].id);\r",
+                  "const schema = {\r",
+                  "    type: \"object\",\r",
+                  "    required: [\"users\", \"total\", \"skip\", \"limit\"],\r",
+                  "    properties: {\r",
+                  "        users: {\r",
+                  "            type: \"array\",\r",
+                  "            items: {\r",
+                  "                type: \"object\",\r",
+                  "                required: [\"id\", \"firstName\", \"lastName\", \"email\"],\r",
+                  "                properties: {\r",
+                  "                    id: { type: \"number\" },\r",
+                  "                    firstName: { type: \"string\" },\r",
+                  "                    lastName: { type: \"string\" },\r",
+                  "                    email: { type: \"string\" }\r",
+                  "                }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        total: { type: \"number\" },\r",
+                  "        skip: { type: \"number\" },\r",
+                  "        limit: { type: \"number\" }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "pm.test(\"Response should match JSON schema\", function () {\r",
+                  "    pm.response.to.have.jsonSchema(schema);\r",
+                  "});"
+                ],
+                "packages": {},
+                "requests": {},
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{auth_secret_04m0}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "x-api-key",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_002_Create_User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code should be 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "let jsonData = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"User ID should be present\", function () {\r",
+                  "    pm.expect(jsonData.id).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"First name should be Swamy\", function () {\r",
+                  "    pm.expect(jsonData.firstName).to.eql(\"Swamy\");\r",
+                  "});\r",
+                  "\r",
+                  "// Capture dynamic user ID\r",
+                  "pm.environment.set(\"userId\", jsonData.id);\r",
+                  "\r",
+                  "pm.test(\"User ID saved in environment\", function () {\r",
+                  "    pm.expect(pm.environment.get(\"userId\")).to.eql(jsonData.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const randomNumber = Math.floor(Math.random() * 100000);\r",
+                  "\r",
+                  "pm.environment.set(\r",
+                  "    \"randomEmail\",\r",
+                  "    \"swamy\" + randomNumber + \"@test.com\"\r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Swamy\",\r\n  \"lastName\": \"Dandu\",\r\n  \"age\": 34,\r\n  \"email\": \"{{randomEmail}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_003_Get_User_By_ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"User ID should match saved ID\", function () {\r\n    pm.expect(data.id).to.eql(\r\n        Number(pm.environment.get(\"existingUserId\"))\r\n    );\r\n});\r\n\r\npm.test(\"Email should be available\", function () {\r\n    pm.expect(data.email).to.include(\"@\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{existingUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{existingUserId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_004_Get_Users_Pagination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"Only 5 users should be returned\", function () {\r\n    pm.expect(data.users.length).to.eql(5);\r\n});\r\n\r\npm.test(\"Total users count should be available\", function () {\r\n    pm.expect(data.total).to.be.above(0);\r\n});\r\n\r\npm.test(\"Limit should be 5\", function () {\r\n    pm.expect(data.limit).to.eql(5);\r\n});\r\n\r\npm.test(\"Skip should be 5\", function () {\r\n    pm.expect(data.skip).to.eql(5);\r\n});\r\npm.test(\"Second page should return different users\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.users[0].id).to.not.eql(1);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users?limit=5&skip=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "skip",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_005_Get_Invalid_User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"Error message should be available\", function () {\r\n    pm.expect(data.message).to.exist;\r\n});\r\n\r\npm.test(\"Error message should mention user not found\", function () {\r\n    pm.expect(data.message).to.include(\"not found\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "99999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_006_Create_User_Invalid_Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"API response should contain user ID\", function () {\r\n    pm.expect(data.id).to.exist;\r\n});\r\n\r\npm.test(\"API returned invalid email as submitted\", function () {\r\n    pm.expect(data.email).to.eql(\"invalid-email\");\r\n});\r\n\r\npm.test(\"API returned negative age as submitted\", function () {\r\n    pm.expect(data.age).to.eql(-5);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"\",\r\n    \"lastName\": \"\",\r\n    \"age\": -5,\r\n    \"email\": \"invalid-email\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_010_Get_User_DataDriven",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\nconst expectedId = Number(\r\n    pm.iterationData.get(\"testUserId\")\r\n);\r\n\r\npm.test(\"Status code should be 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"User ID should match test data\", function () {\r\n    pm.expect(data.id).to.eql(expectedId);\r\n});\r\n\r\npm.test(\"First name should not be empty\", function () {\r\n    pm.expect(data.firstName).to.not.be.empty;\r\n});\r\n\r\npm.test(\"Email should be valid\", function () {\r\n    pm.expect(data.email).to.include(\"@\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{testUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{testUserId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_001_Get_All_Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "\r",
+                  "// Test Case 1: Verify Status Code\r",
+                  "pm.test(\"Status code should be 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 2: Verify Response Time\r",
+                  "pm.test(\"Response time should be below 3000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 3: Verify Response Body\r",
+                  "pm.test(\"Response body should not be empty\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.not.be.empty;\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 4: Verify Users Array\r",
+                  "pm.test(\"Users array should exist\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 5: Verify Users Count\r",
+                  "pm.test(\"Users list should contain records\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users.length).to.be.above(0);\r",
+                  "});\r",
+                  "\r",
+                  "// Test Case 6: Verify First User ID\r",
+                  "pm.test(\"First user should have a valid ID\", function () {\r",
+                  "    let jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.users[0].id).to.be.a(\"number\");\r",
+                  "});\r",
+                  "const data = pm.response.json();\r",
+                  "\r",
+                  "pm.environment.set(\"existingUserId\", data.users[0].id);\r",
+                  "\r",
+                  "console.log(\"Saved User ID:\", data.users[0].id);\r",
+                  "const schema = {\r",
+                  "    type: \"object\",\r",
+                  "    required: [\"users\", \"total\", \"skip\", \"limit\"],\r",
+                  "    properties: {\r",
+                  "        users: {\r",
+                  "            type: \"array\",\r",
+                  "            items: {\r",
+                  "                type: \"object\",\r",
+                  "                required: [\"id\", \"firstName\", \"lastName\", \"email\"],\r",
+                  "                properties: {\r",
+                  "                    id: { type: \"number\" },\r",
+                  "                    firstName: { type: \"string\" },\r",
+                  "                    lastName: { type: \"string\" },\r",
+                  "                    email: { type: \"string\" }\r",
+                  "                }\r",
+                  "            }\r",
+                  "        },\r",
+                  "        total: { type: \"number\" },\r",
+                  "        skip: { type: \"number\" },\r",
+                  "        limit: { type: \"number\" }\r",
+                  "    }\r",
+                  "};\r",
+                  "\r",
+                  "pm.test(\"Response should match JSON schema\", function () {\r",
+                  "    pm.response.to.have.jsonSchema(schema);\r",
+                  "});\r",
+                  "pm.test(\"Collection variable should be available\", function () {\r",
+                  "    pm.expect(pm.collectionVariables.get(\"projectName\"))\r",
+                  "        .to.eql(\"E-Commerce API\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "pm.test(\"Users API response should be JSON\", function () {\r",
+              "    pm.expect(\r",
+              "        pm.response.headers.get(\"Content-Type\")\r",
+              "    ).to.include(\"application/json\");\r",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02_Authentication",
+      "item": [
+        {
+          "name": "TC_007_User_Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();\r\n\r\npm.test(\"Access token should be available\", function () {\r\n    pm.expect(data.accessToken).to.exist;\r\n});\r\n\r\npm.environment.set(\"token\", data.accessToken);\r\n\r\npm.test(\"Token should be saved in environment\", function () {\r\n    pm.expect(pm.environment.get(\"token\")).to.eql(data.accessToken);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_008_Get_Auth_User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"User ID should be available\", function () {\r\n    pm.expect(data.id).to.exist;\r\n});\r\n\r\npm.test(\"Username should be Emilys\", function () {\r\n    pm.expect(data.username).to.eql(\"emilys\");\r\n});\r\n\r\npm.test(\"Email should be available\", function () {\r\n    pm.expect(data.email).to.include(\"@\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "TC_009_Invalid_Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code should be 401\", function () {\r\n    pm.response.to.have.status(401);\r\n});\r\n\r\nconst data = pm.response.json();\r\n\r\npm.test(\"Error message should be available\", function () {\r\n    pm.expect(data.message).to.exist;\r\n});\r\n\r\npm.test(\"Error message should indicate invalid token\", function () {\r\n    pm.expect(data.message).to.include(\"Invalid/Expired Token\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "invalid_token_123",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test(\"API response should be successful\", function () {\r",
+          "    pm.expect(pm.response.code).to.be.oneOf([\r",
+          "        200, 201\r",
+          "    ]);\r",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_secret_04m0",
+      "secret": true
+    }
+  ]
+}
