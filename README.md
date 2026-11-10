@@ -38,3 +38,14 @@ https://dummyjson.com
 
 ## Author
 Swamy Dandu
+
+## Git Workflow
+
+This project uses Git for version control.
+
+- git clone - Clone repository
+- git status - Check file changes
+- git add - Stage files
+- git commit - Save changes locally
+- git push - Upload changes to GitHub
+- git pull - Get latest changes from GitHub
